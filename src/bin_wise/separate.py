@@ -5,9 +5,14 @@ from dotenv import load_dotenv
 from langchain.chains import LLMChain
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
+from langchain.prompts.base import StringPromptTemplate
+
+from bin_wise.core.llm_utils import parse
 
 # .env ファイルをロード
 load_dotenv()
+
+
 
 # プロンプトテンプレートを定義
 prompt_template = PromptTemplate(
@@ -29,14 +34,10 @@ prompt_template = PromptTemplate(
 llm = ChatOpenAI(model_name="gpt-4-turbo", temperature=0)
 
 # LLMChainを作成
-llm_chain = LLMChain(
-    llm=llm,
-    prompt=prompt_template
-)
+llm_chain = prompt_template | llm | parse
 
 def separate(text):
-    response = llm_chain.run(text)
-    result = json.loads(response)  # LLMの出力をJSONに変換
+    result = llm_chain.invoke(text)
     return result
 
 if __name__ == "__main__":

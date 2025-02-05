@@ -1,10 +1,6 @@
 import os
 from langchain.embeddings import OpenAIEmbeddings
 
-# ここでは環境変数として OpenAI の APIキーを設定します。
-# 直接スクリプト内にキーを埋め込みたくない場合は、ターミナル/コマンドライン等から
-# export OPENAI_API_KEY="sk-xxxxxxx..." のように設定しておきましょう。
-os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_API_KEY"
 
 def get_text_embedding(text: str):
     """
