@@ -12,8 +12,6 @@ from bin_wise.core.llm_utils import parse
 # .env ファイルをロード
 load_dotenv()
 
-
-
 # プロンプトテンプレートを定義
 prompt_template = PromptTemplate(
     input_variables=["text"],

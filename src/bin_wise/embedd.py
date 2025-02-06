@@ -1,6 +1,18 @@
 import os
 from langchain.embeddings import OpenAIEmbeddings
+#pydantic BaseModel
+from pydantic import BaseModel
 
+class EmbeddingModel(BaseModel):
+    provider: str
+    model: str
+    # ベクトルの次元数
+    vector_dim: int
+
+EMBEDD = EmbeddingModel(
+    provider="openai", 
+    model="text-embedding-ada-002", 
+    vector_dim=256) 
 
 def get_text_embedding(text: str):
     """
@@ -9,7 +21,7 @@ def get_text_embedding(text: str):
     # LangChainのOpenAIEmbeddingsをインスタンス化
     embedding_model = OpenAIEmbeddings(
         # モデルの指定（任意のEmbeddingsモデルが利用可能）
-        model="text-embedding-ada-002",  
+        model=EMBEDD.model,  
         openai_api_key=os.environ["OPENAI_API_KEY"]
     )
     # テキストを埋め込みベクトルに変換（単一テキストの場合は embed_query を利用する）

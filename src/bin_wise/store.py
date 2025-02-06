@@ -5,6 +5,7 @@ import os
 from pydantic import BaseModel
 import sqlite3
 import pandas as pd
+from bin_wise.embedd import EMBEDD, EmbeddingModel 
 
 
 """地方自治体 Excelファイルのデータ構造
@@ -63,7 +64,7 @@ class ItemTypes(BaseModel):
 class MunicipalityItemTypeCategoryMap(BaseModel):
     """自治体、ごみの種類、ごみ分別目のマッピング"""
     # マッピングのID
-    map_id: str
+    id: str
     # 自治体のID
     municipality_id: str
     # ごみの種類のID
@@ -167,19 +168,36 @@ class DBhandler:
         return mm
 
 import milvus
-import bin_wise.embedd
+from bin_wise import embedd
+from pymilvus import MilvusClient
 
 class VectorStore:
     """ milvusのベクトルストア """
-    def __init__(self):
-        self.client = milvus.Milvus()
+    def __init__(self, host: str, port: str, local_db_path: str= None, embedding_model : EmbeddingModel = None):
+        if local_db_path:
+            self.client = MilvusClient(local_db_path)
+        else:
+            self.client = MilvusClient(host, port)
         self.collection_name = 'item_types_vectors'
+        self.client.create_collection(
+            collection_name=self.collection_name,
+            dimension=embedding_model.vector_dim,
+        )
+        self.client.schema.add_field(
+            field_name="my_id",
+            datatype=DataType.INT64,
+            # highlight-start
+            is_primary=True,
+            auto_id=True,
+            # highlight-end
+        )
 
     def set_item_type(self, item_type: ItemTypes):
         explanation_vector = embedd.get_text_embedding(item_type.explanation)
         name_vector = embedd.get_text_embedding(item_type.type_name)
         # 保存
-        self.client.insert(collection_name=self.collection_name, records=[name_vector, explanation_vector])
+        data = {}
+        self.client.insert(collection_name=self.collection_name, data=[name_vector, explanation_vector])
 
     def search_item(self, item_like_name: str):
         vector = embedd.get_text_embedding(item_like_name)
