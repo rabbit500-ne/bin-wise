@@ -5,4 +5,4 @@ langchain-openai
 python-dotenv
 langchain_google_community
 pandas
-milvus
+qdrant-client

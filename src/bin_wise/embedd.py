@@ -1,5 +1,5 @@
 import os
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_community.embeddings import OpenAIEmbeddings
 #pydantic BaseModel
 from pydantic import BaseModel
 

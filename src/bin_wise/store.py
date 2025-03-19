@@ -167,40 +167,16 @@ class DBhandler:
         )
         return mm
 
-import milvus
 from bin_wise import embedd
-from pymilvus import MilvusClient
 
-class VectorStore:
-    """ milvusのベクトルストア """
-    def __init__(self, host: str, port: str, local_db_path: str= None, embedding_model : EmbeddingModel = None):
-        if local_db_path:
-            self.client = MilvusClient(local_db_path)
-        else:
-            self.client = MilvusClient(host, port)
-        self.collection_name = 'item_types_vectors'
-        self.client.create_collection(
-            collection_name=self.collection_name,
-            dimension=embedding_model.vector_dim,
-        )
-        self.client.schema.add_field(
-            field_name="my_id",
-            datatype=DataType.INT64,
-            # highlight-start
-            is_primary=True,
-            auto_id=True,
-            # highlight-end
-        )
 
-    def set_item_type(self, item_type: ItemTypes):
-        explanation_vector = embedd.get_text_embedding(item_type.explanation)
-        name_vector = embedd.get_text_embedding(item_type.type_name)
-        # 保存
-        data = {}
-        self.client.insert(collection_name=self.collection_name, data=[name_vector, explanation_vector])
+from qdrant_client import QdrantClient
+print(os.environ.get("QDRANT_URL"))
+print(os.environ.get("QDRANT_API_KEY"))
+#qdrant_client = QdrantClient(
+#    url=os.environ.get("QDRANT_URL"),
+#    api_key=os.environ.get("QDRANT_API_KEY"),
+#)
 
-    def search_item(self, item_like_name: str):
-        vector = embedd.get_text_embedding(item_like_name)
-        # 類似ベクトルを検索
-        results = self.client.search(collection_name=self.collection_name, query_records=[vector])
-        return results
+
+#print(qdrant_client.get_collections())
